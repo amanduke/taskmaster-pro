@@ -45,29 +45,6 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
-// callback function
-
-//  $(".list-group").on("click", "p", function() {
-//    console.log("<p> was clicked");
-//  });
-
-//  converts (this) into a jQuery object
-
-//  $(".list-group").on("click", "p", function() {
-//    console.log(this);
-//  });
-
-//  $(".list-group").on("click", "p", function() {
-//    var text = $(this).text();
-//    console.log(text);
-//  });
-
-// $(".list-group").on("click", "p", function() {
-//   var text = $(this)
-//   .text()
-//   .trim();
-// });
-
 $(".list-group").on("click", "p", function() {
   var text = $(this)
     .text()
@@ -129,7 +106,7 @@ $(".list-group").on("click", "span", function() {
 });
 
   // value of due date was changed
-  $(".list-group").on("blue", "input[tyep='text']", function() {
+  $(".list-group").on("blur", "input[type='text']", function() {
     // get current text
     var date = $(this)
       .val()
@@ -152,7 +129,7 @@ $(".list-group").on("click", "span", function() {
 
   // recreate span element with bootstrap classes
   var taskSpan = $("<span>")
-    .addClass("bade badge-primary badge-pill")
+    .addClass("badge badge-primary badge-pill")
     .text(date);
 
     // replace input with span element
