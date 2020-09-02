@@ -161,9 +161,10 @@ saveTasks();
 console.log(tempArr);
     
 }
-
   
-  });
+});
+
+
 
   // value of due date was changed
   $(".list-group").on("blur", "input[type='text']", function() {
@@ -243,4 +244,22 @@ $("#remove-tasks").on("click", function() {
 // load tasks for the first time
 loadTasks();
 
+
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    console.log("drop");
+  },
+  over: function(event, ui) {
+    console.log("over");
+  },
+  out: function(event, ui) {
+    console.log("out");
+
+    ui.draggable.remove();
+  }
+
+  
+});
 
