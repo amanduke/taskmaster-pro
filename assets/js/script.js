@@ -3,16 +3,16 @@ var tasks = {};
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
-  var taskSpan = $("<span>")
-    .addClass("badge badge-primary badge-pill")
-    .text(taskDate);
-  var taskP = $("<p>")
-    .addClass("m-1")
-    .text(taskText);
+
+  var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(taskDate);
+
+  var taskP = $("<p>").addClass("m-1").text(taskText);
 
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi);
 
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
@@ -57,7 +57,7 @@ $(".list-group").on("click", "p", function() {
     textInput.trigger("focus");
 });
 
-$(".list-group").on("blur", "textarea", function() {
+$(".list-group").on("change", "input[type='text']", function() {
 
   // get the textarea's current value/text
   var text = $(this)
@@ -88,22 +88,26 @@ $(".list-group").on("blur", "textarea", function() {
 // due date was clicked
 $(".list-group").on("click", "span", function() {
   // get current text
-  var date = $(this)
-  .text()
-  .trim();
+  var date = $(this).text().trim();
 
   // create new input element
-  var dateInput = $("<input>")
-    .attr("type", "text")
-    .addClass("form-control")
-    .val(date);
+  var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(date);
 
     // swap out elements
     $(this).replaceWith(dateInput);
 
+    // enable jquery ui datepicker
+    dateInput.datepicker({
+      minDate: 1,
+      onClose: function() {
+        //when caldendar is closed, force a "change" event on the 'dateInput'
+        $(this).trigger("change");
+      }
+    });
     // automatically focus on new element
     dateInput.trigger("focus");
 });
+
 
 
   $(".card .list-group").sortable({
@@ -165,6 +169,47 @@ console.log(tempArr);
 });
 
 
+// moment.js 
+
+var rightNow = moment().format("MMMM Do, YYYY - hh:mm:ss a");
+console.log(rightNow);
+
+var tomorrow = moment().add(1, "day").format("dddd, MM-D-YYYY [at] hh:mm:ss A");
+console.log(tomorrow);
+
+var pastDate = moment("12-01-1999", "MM-DD-YYYY").format("dddd, MM/DD/YY");
+console.log(pastDate);
+
+//var twoDaysFromNow = moment().add(2, "days");
+
+// get current date
+var currentDate = new Date();
+
+// set how many days from now we want
+var daysFromNow = 2;
+
+// get date two days from now
+var twoDaysFromNow = new Date(currentDate.setDate(currentDate.getDate() + daysFromNow));
+
+
+var auditTask = function(taskEl) {
+  // get date from task element
+  var date = $(taskEl).find("span").text().trim();
+
+  // convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17);
+
+  // remove any old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  // apply new class if task is near/over due date
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  } 
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
 
   // value of due date was changed
   $(".list-group").on("blur", "input[type='text']", function() {
@@ -209,6 +254,9 @@ $("#task-form-modal").on("shown.bs.modal", function() {
   $("#modalTaskDescription").trigger("focus");
 });
 
+
+
+
 // save button in modal was clicked
 $("#task-form-modal .btn-primary").click(function() {
   // get form values
@@ -241,25 +289,32 @@ $("#remove-tasks").on("click", function() {
   saveTasks();
 });
 
-// load tasks for the first time
-loadTasks();
-
+// date picker pop up
+$("#modalDueDate").datepicker({
+  minDate: 1
+});
 
 $("#trash").droppable({
   accept: ".card .list-group-item",
   tolerance: "touch",
   drop: function(event, ui) {
     console.log("drop");
+    ui.draggable.remove(); 
   },
   over: function(event, ui) {
     console.log("over");
   },
   out: function(event, ui) {
     console.log("out");
-
-    ui.draggable.remove();
   }
 
   
 });
+
+
+// load tasks for the first time
+loadTasks();
+
+
+
 
